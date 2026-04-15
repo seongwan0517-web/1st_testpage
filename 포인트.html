@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>학교 포인트 시스템</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .hidden { display: none; }
+        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        button { cursor: pointer; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>🏫 포인트 관리 시스템</h2>
+    <hr>
+
+    <div id="login-section" class="card">
+        <h3>로그인</h3>
+        <input type="text" id="username" placeholder="아이디">
+        <input type="password" id="password" placeholder="비밀번호">
+        <button onclick="login()">접속하기</button>
+    </div>
+
+    <div id="student-section" class="card hidden">
+        <h3>환영합니다, <span id="user-name-display"></span>님!</h3>
+        <p>내 보유 포인트: <strong><span id="user-points-display">0</span> P</strong></p>
+        <hr>
+        <h4>🛒 포인트 상점</h4>
+        <div id="shop-list"></div>
+    </div>
+
+    <div id="admin-section" class="card hidden">
+        <h3>👨‍🏫 관리자 페이지</h3>
+        <h4>학생 포인트 관리</h4>
+        <div id="admin-student-list"></div>
+        <hr>
+        <h4>상점 품목 관리</h4>
+        <div id="admin-item-list"></div>
+    </div>
+
+    <script>
+        // 임시 데이터 (실제 프로젝트에선 서버 DB에 들어갈 내용)
+        let users = [
+            { id: "student1", pw: "1234", name: "김철수", role: "student", points: 1000 },
+            { id: "teacher1", pw: "admin123", name: "박선생님", role: "admin", points: 0 }
+        ];
+
+        let shopItems = [
+            { id: 1, name: "매점 500원권", price: 500 },
+            { id: 2, name: "숙제 면제권", price: 1000 }
+        ];
+
+        let currentUser = null;
+
+        // 로그인 함수
+        function login() {
+            const id = document.getElementById('username').value;
+            const pw = document.getElementById('password').value;
+
+            const user = users.find(u => u.id === id && u.pw === pw);
+
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-section').classList.add('hidden');
+                
+                if (user.role === 'student') {
+                    showStudentPage();
+                } else {
+                    showAdminPage();
+                }
+            } else {
+                alert("아이디 또는 비밀번호가 틀렸습니다.");
+            }
+        }
+
+        // 학생 페이지 렌더링
+        function showStudentPage() {
+            document.getElementById('student-section').classList.remove('hidden');
+            document.getElementById('user-name-display').innerText = currentUser.name;
+            document.getElementById('user-points-display').innerText = currentUser.points;
+
+            let html = "";
+            shopItems.forEach(item => {
+                html += `<p>${item.name} - ${item.price}P <button onclick="buyItem(${item.price})">구매</button></p>`;
+            });
+            document.getElementById('shop-list').innerHTML = html;
+        }
+
+        // 관리자 페이지 렌더링
+        function showAdminPage() {
+            document.getElementById('admin-section').classList.remove('hidden');
+            renderAdminStudents();
+        }
+
+        function renderAdminStudents() {
+            let html = "";
+            users.filter(u => u.role === 'student').forEach(s => {
+                html += `<p>${s.name}: ${s.points}P 
+                        <button onclick="updatePoint('${s.id}', 100)">+100</button>
+                        <button onclick="updatePoint('${s.id}', -100)">-100</button></p>`;
+            });
+            document.getElementById('admin-student-list').innerHTML = html;
+        }
+
+        function updatePoint(sid, amount) {
+            const user = users.find(u => u.id === sid);
+            user.points += amount;
+            renderAdminStudents(); // 화면 갱신
+            alert(`${user.name}의 포인트가 수정되었습니다.`);
+        }
+
+        function buyItem(price) {
+            if (currentUser.points >= price) {
+                currentUser.points -= price;
+                document.getElementById('user-points-display').innerText = currentUser.points;
+                alert("구매 완료!");
+            } else {
+                alert("포인트가 부족합니다.");
+            }
+        }
+    </script>
+</body>
+</html>
