@@ -10,20 +10,20 @@
 
 <style>
 :root {
-  --navy:     #0b1d3a;
+  --navy:      #0b1d3a;
   --navy-mid: #163260;
-  --gold:     #c9a84c;
+  --gold:      #c9a84c;
   --gold-lt:  #e8c97a;
   --cream:    #f7f3eb;
   --cream-dk: #ede5d4;
   --white:    #ffffff;
   --txt:      #1a1a2e;
   --muted:    #7a8499;
-  --border:   rgba(201,168,76,0.22);
+  --border:    rgba(201,168,76,0.22);
   --card-bg:  rgba(255,255,255,0.78);
   --sh-lg:    0 24px 64px rgba(11,29,58,0.13);
   --sh-sm:    0 4px 18px rgba(11,29,58,0.08);
-  --r-card:   26px;
+  --r-card:    26px;
   --r-btn:    15px;
   --r-input:  13px;
 }
@@ -121,9 +121,9 @@ body {
 
 /* ── STEP 라벨 ── */
 .step-lbl {
-  font-size: 10.5px; font-weight: 700;
+  font-size: 11px; font-weight: 700;
   color: var(--gold); letter-spacing: .11em; text-transform: uppercase;
-  margin: 20px 0 9px;
+  margin: 16px 0 7px;
   display: flex; align-items: center; gap: 7px;
 }
 .step-lbl::after {
@@ -183,7 +183,15 @@ button:active { transform: scale(.97); }
 .btn-soft { background: rgba(11,29,58,.07); color: var(--muted); margin-top:18px; }
 .btn-soft:hover { background: rgba(11,29,58,.12); color: var(--navy); }
 
-/* ── 입력 ── */
+/* 공감 버튼 스타일 */
+.btn-like {
+  background: linear-gradient(135deg, #fff5f5, #ffe3e3);
+  color: #e03131; border: 1px solid rgba(224,49,49,0.2);
+  display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px;
+}
+.btn-like:hover { background: #ffe3e3; }
+
+/* ── 입력 및 체크박스 ── */
 input, select {
   width: 100%; padding: 13px 15px;
   border-radius: var(--r-input);
@@ -209,7 +217,33 @@ input:focus, select:focus {
 }
 input::placeholder { color: #bac0cc; }
 
-/* ── 유형 그리드 ── */
+/* [수정] 학교 검색창 전용 스타일 스타일 */
+.search-input-wrapper {
+  position: relative;
+  margin-top: 14px;
+}
+.search-input-wrapper input {
+  padding-right: 40px;
+  border: 1.5px solid var(--gold);
+}
+.search-input-wrapper::after {
+  content: '🔍';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-20%);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.check-container {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 600; color: #b91c1c; cursor: pointer;
+}
+.check-container input[type="checkbox"] {
+  width: 17px; height: 17px; -webkit-appearance: checkbox; appearance: checkbox; margin-top: 0; cursor: pointer;
+}
+
+/* ── 유형 선택 필터 그리드 ── */
 .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .type-btn {
   padding: 13px 8px;
@@ -235,7 +269,34 @@ input::placeholder { color: #bac0cc; }
   transform: translateY(-2px);
 }
 
-/* ── 결과 아이템 ── */
+.type-btn.all-tab {
+  grid-column: span 2;
+  background: rgba(201,168,76,0.1);
+  border: 1.5px dashed var(--gold);
+}
+.type-btn.all-tab.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+  color: var(--navy); border-color: transparent;
+}
+
+/* ── 상세 정보 메타 레이아웃 ── */
+.info-badge-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.info-tag {
+  background: var(--navy); color: var(--gold-lt); font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 6px;
+}
+.info-tag.region-tag { background: rgba(201,168,76,0.15); color: var(--navy); border: 1px solid var(--border); }
+.info-tag.urgent-tag { background: #7f1d1d; color: #fecaca; }
+
+.info-table { width: 100%; margin-top: 12px; border-collapse: collapse; text-align: left; }
+.info-table th, .info-table td { padding: 10px 6px; font-size: 12.5px; border-bottom: 1px dashed var(--border); }
+.info-table th { color: var(--muted); font-weight: 600; width: 85px; }
+.info-table td { color: var(--navy); font-weight: 400; }
+.info-link { color: #1c7ed6; text-decoration: none; font-weight: 600; }
+.info-link:hover { text-decoration: underline; }
+
+/* ── 결과 리스트 및 아이템 ── */
+.result-list-box { margin-top: 9px; }
 .result-item {
   padding: 15px 18px;
   border-radius: 14px;
@@ -244,6 +305,7 @@ input::placeholder { color: #bac0cc; }
   color: var(--navy); border: 1px solid var(--border);
   cursor: pointer; transition: all .18s;
   display: flex; align-items: center; justify-content: space-between;
+  position: relative;
 }
 .result-item::after { content: '›'; color: var(--gold); font-size: 20px; line-height: 1; }
 .result-item:hover {
@@ -251,8 +313,30 @@ input::placeholder { color: #bac0cc; }
   box-shadow: 0 8px 22px rgba(11,29,58,.11);
   border-color: var(--gold);
 }
+
+.result-item.urgent {
+  background: linear-gradient(135deg, #fff5f5, #ffe3e3);
+  border: 1.5px solid #f87171;
+}
+.result-item.urgent::after { color: #dc2626; }
+.urgent-badge {
+  background: #dc2626; color: #fff; font-size: 10px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px; margin-right: 6px; vertical-align: middle;
+}
+
 .result-empty {
-  font-size: 13px; color: #b5bdc8; text-align: center; padding: 14px 0;
+  font-size: 13px; color: #b5bdc8; text-align: center; padding: 24px 0;
+}
+
+/* ── 페이지네이션 컴포넌트 ── */
+.pagination-container {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 0 4px;
+}
+.pagination-container button {
+  width: auto; padding: 8px 16px; margin-top: 0; font-size: 12px; border-radius: 10px;
+}
+.page-indicator {
+  font-size: 13px; font-weight: 700; color: var(--navy); letter-spacing: 0.05em;
 }
 
 /* ── 포스터 박스 ── */
@@ -260,7 +344,7 @@ input::placeholder { color: #bac0cc; }
   background: linear-gradient(135deg,rgba(247,243,235,.9),rgba(237,229,212,.6));
   border: 2px dashed rgba(201,168,76,.35);
   border-radius: 18px; padding: 14px;
-  min-height: 290px;
+  min-height: 220px;
   display: flex; justify-content: center; align-items: center;
   overflow: hidden; margin-top: 14px;
 }
@@ -342,6 +426,28 @@ input::placeholder { color: #bac0cc; }
 /* ── 삭제결과 행 ── */
 .del-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .del-row button { width:auto; padding:9px 18px; margin-top:0; font-size:12.5px; border-radius:11px; }
+
+/* ── 하단 푸터 ── */
+.site-footer {
+  text-align: center;
+  padding: 30px 14px 44px;
+  border-top: 1px dashed var(--border);
+  margin-top: 20px;
+}
+.credit-text {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.credit-text .names {
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 0.5px;
+}
+.copy-text {
+  font-size: 11px;
+  color: #bac0cc;
+}
 </style>
 </head>
 <body>
@@ -350,7 +456,7 @@ input::placeholder { color: #bac0cc; }
 <div class="bg-glow bg-glow-2"></div>
 
 <header class="site-header">
-  <div class="badge">🎓 Yongyou Middle School</div>
+  <div class="badge">🎓 Youngyu Middle School</div>
   <div class="title">진학<em>센터</em></div>
   <div class="subtitle">고등학교 진학 정보를 쉽고 빠르게 확인해보세요.</div>
 </header>
@@ -372,20 +478,25 @@ input::placeholder { color: #bac0cc; }
 </div>
 
 <div class="page" id="mainPage">
+  
   <div class="card">
-    <div class="card-hd">학교 찾기</div>
-    <div class="step-lbl">Step 01 · 고등학교 유형</div>
+    <div class="card-hd">학교 둘러보기 (유형별)</div>
     <div class="type-grid" id="typeGrid"></div>
-    <div class="step-lbl">Step 02 · 지역 선택</div>
-    <select id="regionSelect"></select>
-    <div class="step-lbl">Step 03 · 학교 선택</div>
-    <select id="schoolSelect"><option value="">학교 선택</option></select>
-    <button class="btn-primary" onclick="searchSchool()" style="margin-top:18px;">조회하기</button>
-  </div>
 
-  <div class="card">
-    <div class="card-hd">조회 결과</div>
-    <div id="resultBox"><div class="result-empty">검색 결과가 여기에 표시됩니다.</div></div>
+    <!-- [수정 사항] 실시간 학교 이름 검색을 위한 입력창 필드 탑재 -->
+    <div class="search-input-wrapper">
+      <input type="text" id="schoolSearchInput" placeholder="찾으시는 학교 이름을 입력하세요..." oninput="onSearchInput()">
+    </div>
+
+    <div class="step-lbl" style="margin-top:28px;" id="listTitleLabel">고등학교 전체 리스트</div>
+    <div class="result-list-box" id="schoolListContainer"></div>
+
+    <!-- 페이지네이션 컨트롤러 -->
+    <div class="pagination-container" id="paginationBox">
+      <button class="btn-soft" id="btnPrevPage" onclick="changePage(-1)">이전</button>
+      <span class="page-indicator" id="pageIndicator">1 / 1</span>
+      <button class="btn-soft" id="btnNextPage" onclick="changePage(1)">다음</button>
+    </div>
   </div>
 
   <div class="card" id="teacherCard" style="display:none;">
@@ -393,30 +504,49 @@ input::placeholder { color: #bac0cc; }
     <div class="manage-grid">
       <div class="manage-btn" onclick="openAddPage()"><span class="ic">🏫</span>학교 추가</div>
       <div class="manage-btn" onclick="openDeletePage()"><span class="ic">🗑</span>학교 삭제</div>
-      <div class="manage-btn" onclick="openPosterPage()"><span class="ic">🖼</span>포스터 등록</div>
-      <div class="manage-btn" onclick="openPosterDeletePage()"><span class="ic">✂️</span>포스터 삭제</div>
     </div>
     <div class="divider"></div>
     <button class="btn-danger" onclick="logout()">로그아웃</button>
   </div>
+
+  <footer class="site-footer">
+    <p class="credit-text">made by <span class="names">맹새봄, 이승빈, 김율환</span></p>
+    <p class="copy-text">© 2026 Youngyu Middle School. All rights reserved.</p>
+  </footer>
 </div>
 
 <div class="page" id="addPage">
   <div class="card">
-    <div class="card-hd">학교 추가</div>
+    <div class="card-hd">학교 정보 등록</div>
+    <div class="step-lbl">학교 기본 정보</div>
     <select id="addType"></select>
     <select id="addRegion"></select>
     <input id="addName" placeholder="학교 이름 입력">
-    <button class="btn-primary" onclick="addSchool()">학교 추가</button>
+    
+    <label class="check-container">
+      <input type="checkbox" id="addUrgent"> 🚨 교사 긴급/중요 공지 고등학교로 지정 (최상단 고정)
+    </label>
+    
+    <div class="step-lbl">연동 정보 및 포스터 (선택)</div>
+    <input id="addLink" placeholder="학교 공식 홈페이지 링크 (https://...)">
+    <input id="addSchedule" placeholder="입학 설명회 일정 (예: 11월 14일 19:00)">
+    
+    <div class="drop-zone" id="dropZone">
+      <span class="dz-ic">📂</span>포스터 사진 첨부하기
+      <div class="dz-sub">클릭하거나 이미지 파일을 드래그하세요</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+    <img id="preview" class="drop-preview">
+
+    <button class="btn-primary" onclick="addSchool()" style="margin-top:18px;">등록 및 저장하기</button>
     <button class="btn-soft" onclick="goMain()">뒤로가기</button>
   </div>
 </div>
 
 <div class="page" id="deletePage">
   <div class="card">
-    <div class="card-hd">학교 삭제</div>
+    <div class="card-hd">학교 정돈 및 삭제</div>
     <select id="deleteType"></select>
-    <select id="deleteRegion"></select>
     <select id="deleteSchool"><option value="">학교 선택</option></select>
     <button class="btn-primary" onclick="showDeleteResult()">조회하기</button>
     <div id="deleteResult"></div>
@@ -424,42 +554,32 @@ input::placeholder { color: #bac0cc; }
   </div>
 </div>
 
-<div class="page" id="posterPage">
-  <div class="card">
-    <div class="card-hd">포스터 등록</div>
-    <select id="posterType"></select>
-    <select id="posterRegion"></select>
-    <select id="posterSchool"><option value="">학교 선택</option></select>
-    <div class="drop-zone" id="dropZone">
-      <span class="dz-ic">📂</span>
-      포스터 사진 올리기
-      <div class="dz-sub">클릭하거나 파일을 드래그하세요</div>
-    </div>
-    <input type="file" id="fileInput" accept="image/*" style="display:none;">
-    <img id="preview" class="drop-preview">
-    <button class="btn-primary" onclick="savePoster()">포스터 등록</button>
-    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
-  </div>
-</div>
-
-<div class="page" id="posterDeletePage">
-  <div class="card">
-    <div class="card-hd">포스터 삭제</div>
-    <select id="posterDeleteType"></select>
-    <select id="posterDeleteRegion"></select>
-    <select id="posterDeleteSchool"><option value="">학교 선택</option></select>
-    <div class="poster-box" id="posterPreviewBox"><div class="poster-empty">등록된 포스터가 없습니다.</div></div>
-    <button class="btn-danger" onclick="deletePoster()" style="margin-top:14px;">포스터 삭제</button>
-    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
-  </div>
-</div>
-
 <div class="page" id="detailPage">
   <div class="card">
     <div class="card-hd"><span id="detailTitle">학교명</span></div>
+    
+    <div class="info-badge-row">
+      <span class="info-tag" id="detailTypeTag">유형</span>
+      <span class="info-tag region-tag" id="detailRegionTag">지역</span>
+      <span class="info-tag urgent-tag" id="detailUrgentTag" style="display:none;">🚨 긴급공지</span>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <th>🌐 학교 링크</th>
+        <td id="detailLinkCell">등록된 링크가 없습니다.</td>
+      </tr>
+      <tr>
+        <th>📅 설명회 일정</th>
+        <td id="detailScheduleCell">일정이 없습니다.</td>
+      </tr>
+    </table>
+
     <div class="poster-box" id="posterBox">
       <div class="poster-empty">등록된 포스터가 없습니다.</div>
     </div>
+
+    <button class="btn-like" id="likeBtn" onclick="pushLike()"><span id="likeHeart">❤️</span> 응원/공감하기 (<span id="likeCount">0</span>)</button>
     <button class="btn-soft" onclick="goMain()" style="margin-top:14px;">← 목록으로</button>
   </div>
 </div>
@@ -475,190 +595,60 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ── 공통 상태 및 데이터 정의 ──────────────────────────────────────────
 let schools = []; 
-let selectedType = '일반고';
+let selectedType = '전체보기'; 
+let searchQuery = ''; // [수정] 검색어 데이터 바인딩 변수 추가
 let selectedImage = '';
+let currentDetailId = ''; 
+
+let currentPage = 1;
+const itemsPerPage = 5;
 
 const types = ['일반고','특성화고','마이스터고','특목고','국제고&외국어고','자율고','예체고','과학고'];
 const regions = ['서울특별시','인천광역시','경기도','부산광역시','대구광역시','광주광역시','대전광역시','울산광역시','강원특별자치도','충청북도','충청남도','전라북도','전라남도','경상북도','경상남도','제주특별자치도'];
 
 const defaultSchools = [
-  {type:'일반고', region:'인천광역시', name:'가림고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'가정고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'가좌고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'검단고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'계산고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'계산여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'계양고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'광성고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'대인고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'덕신고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'도림고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'동산고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'동인천고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'명신여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'문일여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'박문여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'백석고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부개고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부개여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부광고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부광여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부평고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'부평여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'삼산고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'서운고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'서인천고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'석정여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'선인고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'세일고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'송도고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'숭덕여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'신명여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'신송고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'안남고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'연수고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'연수여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'옥련여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인명여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인성여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인일여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인제고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천고잔고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천남고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천남동고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천논현고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천대건고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천마전고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천만수고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천부흥고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천산곡고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천상정고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천세원고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천송천고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천신현고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천연송고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천영선고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천영종고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천예일고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천원당고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천이음고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천중산고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천중앙여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천청라고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천초은고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천포스코고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천아라고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천해송고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천해원고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인천효성고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인항고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인화여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'인하대학교사범대학부속고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'작전고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'작전여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'제물포고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'제일고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'학익고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'학익여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'강화고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'강화여자고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'교동고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'대청고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'덕적고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'백령고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'서도고등학교', poster:''},
-  {type:'일반고', region:'인천광역시', name:'연평고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'강남영상미디어고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'계산공업고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'문곡고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'문학정보고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'부평공업고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'영종국제물류고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'영화관광경영고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천금융고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천기계공업고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천디자인고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천미래생활고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천바이오과학고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천반도체고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천보건고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천뷰티예술고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천비즈니스고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천생활과학고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천소방고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천여자상업고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천재능고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천진산과학고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'인천대중예술고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'한국글로벌셰프고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'한국주얼리고등학교', poster:''},
-  {type:'특성화고', region:'인천광역시', name:'산마을고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천과학고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천과학예술영재학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천국제고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천외국어고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'미추홀외국어고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천예술고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천체육고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천해사고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천공항고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'정석항공과학고등학교', poster:''},
-  {type:'특목고', region:'인천광역시', name:'인천해양과학고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'인천해사고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'인천공항고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'정석항공과학고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'인천해양과학고등학교', poster:''},
-  {type:'마이스터고', region:'인천광역시', name:'인평자동차고등학교', poster:''},
-  {type:'국제고&외국어고', region:'인천광역시', name:'인천국제고등학교', poster:''},
-  {type:'국제고&외국어고', region:'인천광역시', name:'인천외국어고등학교', poster:''},
-  {type:'국제고&외국어고', region:'인천광역시', name:'미추홀외국어고등학교', poster:''},
-  {type:'자율고', region:'인천광역시', name:'인천하늘고등학교', poster:''},
-  {type:'자율고', region:'인천광역시', name:'인천포스코고등학교', poster:''},
-  {type:'자율고', region:'인천광역시', name:'인천대중예술고등학교', poster:''},
-  {type:'예체고', region:'인천광역시', name:'인천예술고등학교', poster:''},
-  {type:'예체고', region:'인천광역시', name:'인천체육고등학교', poster:''},
-  {type:'예체고', region:'인천광역시', name:'인천뷰티예술고등학교', poster:''},
-  {type:'과학고', region:'인천광역시', name:'인천과학고등학교', poster:''},
-  {type:'과학고', region:'인천광역시', name:'인천과학예술영재학교', poster:''}
+  {type:'일반고', region:'인천광역시', name:'가림고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'일반고', region:'인천광역시', name:'가정고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'일반고', region:'인천광역시', name:'가좌고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'일반고', region:'인천광역시', name:'검단고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'일반고', region:'인천광역시', name:'계산고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'일반고', region:'인천광역시', name:'인천영종고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: true},
+  {type:'일반고', region:'인천광역시', name:'인천중산고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'특성화고', region:'인천광역시', name:'영종국제물류고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'특성화고', region:'인천광역시', name:'인천디자인고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'마이스터고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'특목고', region:'인천광역시', name:'인천국제고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
+  {type:'과학고', region:'인천광역시', name:'인천과학고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false}
 ];
 
-// ── Firebase 데이터 로드 및 초기화 ──────────────────────────────────────────
 async function initSchools() {
   const dbRef = ref(db);
   try {
     const snapshot = await get(child(dbRef, 'schools'));
     if (snapshot.exists()) {
-      // Firebase에 저장된 데이터 객체를 배열로 변환
       const dataObj = snapshot.val();
       schools = Object.keys(dataObj).map(key => ({ id: key, ...dataObj[key] }));
     } else {
-      // DB가 비어있는 초기 상태라면 defaultSchools 세팅
       schools = [];
       for (let s of defaultSchools) {
-        const newRef = ref(db, 'schools/' + encodeName(s.name) + '_' + s.type);
-        await set(newRef, s);
-        schools.push({ id: encodeName(s.name) + '_' + s.type, ...s });
+        const id = encodeName(s.name) + '_' + s.type;
+        await set(ref(db, 'schools/' + id), s);
+        schools.push({ id, ...s });
       }
     }
     renderTypes();
     fillSelects();
+    renderSchoolList();
   } catch (error) {
-    console.error("데이터 로드 실패:", error);
+    console.error("Firebase 로딩 실패:", error);
   }
 }
 
-// 키값으로 사용할 수 없는 특수문자 우회 치환 함수
 function encodeName(name) {
   return name.replace(/[\.\#\$\[\]\/]/g, "_");
 }
 
-// ── 페이지 전환 ──────────────────────────────────────
 window.showPage = function(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
   const el = document.getElementById(id);
@@ -673,7 +663,7 @@ window.showPage = function(id) {
 window.guestLogin = () => showPage('mainPage');
 window.openTeacherLogin = () => document.getElementById('teacherLoginBox').style.display = 'block';
 window.closeTeacherLogin = () => document.getElementById('teacherLoginBox').style.display = 'none';
-window.goMain = () => showPage('mainPage');
+window.goMain = () => { showPage('mainPage'); renderSchoolList(); }
 window.logout = () => location.reload();
 
 window.teacherLogin = function() {
@@ -687,200 +677,239 @@ window.teacherLogin = function() {
   }
 }
 
-// ── 유형 버튼 ────────────────────────────────────────
 window.renderTypes = function() {
-  document.getElementById('typeGrid').innerHTML = types.map(t =>
+  let html = `<div class="type-btn all-tab ${selectedType === '전체보기' ? 'active' : ''}" onclick="selectType('전체보기')">✨ 전체 고등학교 보기</div>`;
+  html += types.map(t =>
     `<div class="type-btn ${selectedType === t ? 'active' : ''}" onclick="selectType('${t}')">${t}</div>`
   ).join('');
+  document.getElementById('typeGrid').innerHTML = html;
 }
 
 window.selectType = function(t) { 
   selectedType = t; 
   renderTypes(); 
-  updateSchoolList(); 
+  currentPage = 1; 
+  renderSchoolList();
 }
 
-// ── select 엘리먼트 채우기 ────────────────────────────────────
+// [수정] 인풋 입력 시 실시간 감지하여 검색 연동하는 함수
+window.onSearchInput = function() {
+  searchQuery = document.getElementById('schoolSearchInput').value.trim();
+  currentPage = 1; // 검색할 때마다 첫 페이지로 포커싱
+  renderSchoolList();
+}
+
 window.fillSelects = function() {
   const rH = regions.map(r => `<option>${r}</option>`).join('');
-  ['regionSelect','addRegion','deleteRegion','posterRegion','posterDeleteRegion']
-    .forEach(id => { document.getElementById(id).innerHTML = rH; });
+  document.getElementById('addRegion').innerHTML = rH;
 
   const tH = types.map(t => `<option>${t}</option>`).join('');
-  ['addType','deleteType','posterType','posterDeleteType']
-    .forEach(id => { document.getElementById(id).innerHTML = tH; });
+  ['addType','deleteType'].forEach(id => { document.getElementById(id).innerHTML = tH; });
 
-  // 체인식 이벤트 바인딩
-  document.getElementById('regionSelect').onchange = updateSchoolList;
   document.getElementById('deleteType').onchange = updateDeleteSchools;
-  document.getElementById('deleteRegion').onchange = updateDeleteSchools;
-  document.getElementById('posterType').onchange = updatePosterSchools;
-  document.getElementById('posterRegion').onchange = updatePosterSchools;
-  document.getElementById('posterDeleteType').onchange = updatePosterDeleteSchools;
-  document.getElementById('posterDeleteRegion').onchange = updatePosterDeleteSchools;
-  document.getElementById('posterDeleteSchool').onchange = function() {
-    const s = schools.find(s => s.name === this.value && s.type === document.getElementById('posterDeleteType').value);
-    document.getElementById('posterPreviewBox').innerHTML = s?.poster
-      ? `<img src="${s.poster}">`
-      : `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
-  };
-
-  updateSchoolList(); 
   updateDeleteSchools(); 
-  updatePosterSchools(); 
-  updatePosterDeleteSchools();
 }
 
-window.updateSchoolList = function() {
-  const region = document.getElementById('regionSelect').value;
-  const f = schools
-    .filter(s => s.type === selectedType && s.region === region)
-    .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-  document.getElementById('schoolSelect').innerHTML =
-    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+// [수정] 카테고리 필터와 텍스트 검색 쿼리를 결합한 렌더링 엔진
+function renderSchoolList() {
+  // 1차 카테고리(유형) 필터링
+  let filtered = (selectedType === '전체보기') ? [...schools] : schools.filter(s => s.type === selectedType);
+  
+  // 2차 검색 텍스트 필터링 (학교 이름 기준 일치 여부 확인)
+  if (searchQuery !== '') {
+    filtered = filtered.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }
+  
+  // 상단 타이틀 매칭 변경
+  if (selectedType === '전체보기') {
+    document.getElementById('listTitleLabel').innerText = searchQuery ? `"${searchQuery}" 검색 결과 (전체)` : "고등학교 전체 리스트";
+  } else {
+    document.getElementById('listTitleLabel').innerText = searchQuery ? `${selectedType} 내 "${searchQuery}" 검색 결과` : `${selectedType} 전체 리스트`;
+  }
+
+  // 상단 고정(isUrgent) 및 가나다 오름차순 정렬
+  filtered.sort((a, b) => {
+    const aUrgent = a.isUrgent ? 1 : 0;
+    const bUrgent = b.isUrgent ? 1 : 0;
+    if (bUrgent !== aUrgent) return bUrgent - aUrgent;
+    return a.name.localeCompare(b.name, 'ko');
+  });
+    
+  if(filtered.length === 0) {
+    document.getElementById('schoolListContainer').innerHTML = `<div class="result-empty">조건에 맞는 학교를 찾을 수 없습니다.</div>`;
+    document.getElementById('paginationBox').style.display = 'none';
+    return;
+  }
+  
+  document.getElementById('paginationBox').style.display = 'flex';
+  
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const pageItems = filtered.slice(startIndex, endIndex);
+  
+  document.getElementById('schoolListContainer').innerHTML = pageItems.map(s => {
+    const urgentClass = s.isUrgent ? 'urgent' : '';
+    const urgentBadge = s.isUrgent ? `<span class="urgent-badge">🚨 긴급공지</span>` : '';
+    return `
+      <div class="result-item ${urgentClass}" onclick="openDetail('${s.id}')">
+        <span>${urgentBadge}${s.name} <small style="color:var(--muted); font-size:11px; margin-left:6px;">[${s.type} / ${s.region || '지역 미지정'}]</small></span>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('pageIndicator').innerText = `${currentPage} / ${totalPages}`;
+  document.getElementById('btnPrevPage').disabled = (currentPage === 1);
+  document.getElementById('btnNextPage').disabled = (currentPage === totalPages);
 }
 
-// ── 학교 검색 및 상세 페이지 ────────────────────────────────────────
-window.searchSchool = function() {
-  const name = document.getElementById('schoolSelect').value;
-  if (!name) { alert('학교를 선택하세요.'); return; }
-  document.getElementById('resultBox').innerHTML =
-    `<div class="result-item" onclick="openDetail('${name}')">${name}</div>`;
+window.changePage = function(direction) {
+  currentPage += direction;
+  renderSchoolList();
 }
 
-window.openDetail = function(name) {
+window.openDetail = async function(id) {
+  currentDetailId = id;
   showPage('detailPage');
-  const s = schools.find(s => s.name === name && s.type === selectedType);
-  document.getElementById('detailTitle').innerText = name;
-  document.getElementById('posterBox').innerHTML = s?.poster
-    ? `<img src="${s.poster}">`
-    : `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+  
+  try {
+    const snapshot = await get(ref(db, 'schools/' + id));
+    if(snapshot.exists()) {
+      const s = snapshot.val();
+      document.getElementById('detailTitle').innerText = s.name;
+      document.getElementById('detailTypeTag').innerText = s.type;
+      document.getElementById('detailRegionTag').innerText = s.region || '지역 미지정';
+      
+      if(s.isUrgent) {
+        document.getElementById('detailUrgentTag').style.display = 'inline-block';
+      } else {
+        document.getElementById('detailUrgentTag').style.display = 'none';
+      }
+      
+      if(s.link && s.link.trim() !== '') {
+        let cleanLink = s.link.trim();
+        if(!/^https?:\/\//i.test(cleanLink)) cleanLink = 'https://' + cleanLink;
+        document.getElementById('detailLinkCell').innerHTML = `<a href="${cleanLink}" target="_blank" class="info-link">홈페이지 방문하기 ↗</a>`;
+      } else {
+        document.getElementById('detailLinkCell').innerText = '등록된 링크가 없습니다.';
+      }
+      
+      document.getElementById('detailScheduleCell').innerText = s.schedule || '안내된 설명회 일정이 없습니다.';
+      
+      document.getElementById('posterBox').innerHTML = s.poster
+        ? `<img src="${s.poster}">`
+        : `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+        
+      document.getElementById('likeCount').innerText = s.likes || 0;
+    }
+  } catch(e) {
+    console.error("상세 정보 호출 실패:", e);
+  }
 }
 
-// ── 학교 추가 관리 ────────────────────────────────────────
-window.openAddPage = () => showPage('addPage');
+window.pushLike = async function() {
+  if(!currentDetailId) return;
+  const targetRef = ref(db, 'schools/' + currentDetailId);
+  try {
+    const snapshot = await get(targetRef);
+    if(snapshot.exists()) {
+      const currentData = snapshot.val();
+      const currentLikes = currentData.likes || 0;
+      const nextLikes = currentLikes + 1;
+      
+      await update(targetRef, { likes: nextLikes });
+      
+      const localIdx = schools.findIndex(s => s.id === currentDetailId);
+      if(localIdx !== -1) schools[localIdx].likes = nextLikes;
+      
+      document.getElementById('likeCount').innerText = nextLikes;
+      
+      const heart = document.getElementById('likeHeart');
+      heart.style.transform = 'scale(1.4)';
+      setTimeout(() => heart.style.transform = 'scale(1)', 200);
+    }
+  } catch(e) {
+    alert('공감 반영에 실패했습니다.');
+  }
+}
+
+window.openAddPage = () => {
+  showPage('addPage');
+  selectedImage = '';
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('addName').value = '';
+  document.getElementById('addLink').value = '';
+  document.getElementById('addSchedule').value = '';
+  document.getElementById('addUrgent').checked = false;
+}
+
 window.addSchool = async function() {
   const type = document.getElementById('addType').value;
   const region = document.getElementById('addRegion').value;
   const name = document.getElementById('addName').value.trim();
+  const link = document.getElementById('addLink').value.trim();
+  const schedule = document.getElementById('addSchedule').value.trim();
+  const isUrgent = document.getElementById('addUrgent').checked;
   
   if (!name) { alert('학교 이름을 입력하세요.'); return; }
-  if (schools.find(s => s.name === name && s.type === type && s.region === region)) {
-    alert('이미 등록된 학교입니다.'); return;
+  
+  const customId = encodeName(name) + '_' + type;
+  if (schools.find(s => s.id === customId)) {
+    alert('이미 동일한 유형에 등록된 학교명입니다.'); return;
   }
 
-  const newSchool = { type, region, name, poster: '', custom: true };
-  const customId = encodeName(name) + '_' + type;
+  const newSchool = { type, region, name, poster: selectedImage, link, schedule, likes: 0, isUrgent: isUrgent };
 
   try {
     await set(ref(db, 'schools/' + customId), newSchool);
     schools.push({ id: customId, ...newSchool });
     fillSelects();
-    document.getElementById('addName').value = '';
-    alert('학교 추가 완료');
+    alert('학교 및 진학 정보 등록 완료!');
+    goMain();
   } catch(e) {
     alert('DB 저장 오류 발생');
   }
 }
 
-// ── 학교 삭제 관리 ────────────────────────────────────────
 window.openDeletePage = () => showPage('deletePage');
 window.updateDeleteSchools = function() {
   const type = document.getElementById('deleteType').value;
-  const region = document.getElementById('deleteRegion').value;
-  const f = schools.filter(s => s.type === type && s.region === region);
+  const f = schools.filter(s => s.type === type);
   document.getElementById('deleteSchool').innerHTML =
-    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+    `<option value="">학교 선택</option>` + f.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 window.showDeleteResult = function() {
-  const name = document.getElementById('deleteSchool').value;
-  if (!name) { alert('학교를 선택하세요.'); return; }
+  const id = document.getElementById('deleteSchool').value;
+  if (!id) { alert('학교를 선택하세요.'); return; }
+  const s = schools.find(item => item.id === id);
   document.getElementById('deleteResult').innerHTML = `
     <div class="result-item" style="cursor:default; margin-top:12px;">
       <div class="del-row">
-        <span>${name}</span>
-        <button class="btn-danger" onclick="deleteSchoolFinal('${name}')">삭제</button>
+        <span>${s.name}</span>
+        <button class="btn-danger" onclick="deleteSchoolFinal('${s.id}')">삭제</button>
       </div>
     </div>`;
 }
 
-window.deleteSchoolFinal = async function(name) {
-  const type = document.getElementById('deleteType').value;
-  const target = schools.find(s => s.name === name && s.type === type);
-  if (!target) return;
-
+window.deleteSchoolFinal = async function(id) {
   try {
-    await remove(ref(db, 'schools/' + target.id));
-    schools = schools.filter(s => s.id !== target.id);
+    await remove(ref(db, 'schools/' + id));
+    schools = schools.filter(s => s.id !== id);
     fillSelects();
     document.getElementById('deleteResult').innerHTML = '';
     alert('삭제 완료');
+    goMain();
   } catch(e) {
     alert('삭제 처리 중 오류 발생');
   }
 }
 
-// ── 포스터 등록 관리 ──────────────────────────────────────
-window.openPosterPage = () => showPage('posterPage');
-window.updatePosterSchools = function() {
-  const type = document.getElementById('posterType').value;
-  const region = document.getElementById('posterRegion').value;
-  const f = schools.filter(s => s.type === type && s.region === region);
-  document.getElementById('posterSchool').innerHTML =
-    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
-}
-
-window.savePoster = async function() {
-  const type = document.getElementById('posterType').value;
-  const name = document.getElementById('posterSchool').value;
-  if (!name) { alert('학교를 선택하세요.'); return; }
-  if (!selectedImage) { alert('이미지를 선택하세요.'); return; }
-
-  const target = schools.find(s => s.name === name && s.type === type);
-  if (!target) return;
-
-  try {
-    await update(ref(db, 'schools/' + target.id), { poster: selectedImage });
-    target.poster = selectedImage;
-    alert('포스터 등록 완료');
-  } catch(e) {
-    alert('포스터 저장 실패');
-  }
-}
-
-// ── 포스터 삭제 관리 ──────────────────────────────────────
-window.openPosterDeletePage = () => showPage('posterDeletePage');
-window.updatePosterDeleteSchools = function() {
-  const type = document.getElementById('posterDeleteType').value;
-  const region = document.getElementById('posterDeleteRegion').value;
-  const f = schools.filter(s => s.type === type && s.region === region);
-  document.getElementById('posterDeleteSchool').innerHTML =
-    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
-  document.getElementById('posterPreviewBox').innerHTML =
-    `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
-}
-
-window.deletePoster = async function() {
-  const type = document.getElementById('posterDeleteType').value;
-  const name = document.getElementById('posterDeleteSchool').value;
-  if (!name) { alert('학교를 선택하세요.'); return; }
-
-  const target = schools.find(s => s.name === name && s.type === type);
-  if (!target) return;
-
-  try {
-    await update(ref(db, 'schools/' + target.id), { poster: '' });
-    target.poster = '';
-    document.getElementById('posterPreviewBox').innerHTML =
-      `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
-    alert('포스터 삭제 완료');
-  } catch(e) {
-    alert('포스터 삭제 실패');
-  }
-}
-
-// ── 이미지 로컬 파일 드롭 및 업로드 ────────────────────────────────────
 const drop = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 drop.onclick = () => fileInput.click();
@@ -900,7 +929,6 @@ function loadImage(f) {
   r.readAsDataURL(f);
 }
 
-// 실행 시작
 initSchools();
 </script>
 
