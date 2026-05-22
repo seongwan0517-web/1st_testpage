@@ -217,7 +217,6 @@ input:focus, select:focus {
 }
 input::placeholder { color: #bac0cc; }
 
-/* [수정] 학교 검색창 전용 스타일 스타일 */
 .search-input-wrapper {
   position: relative;
   margin-top: 14px;
@@ -372,6 +371,44 @@ input::placeholder { color: #bac0cc; }
   border-color: var(--gold);
 }
 
+/* ── 관리 콘솔 인라인 행 ── */
+.admin-school-row {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.admin-school-info {
+  font-weight: 600; font-size: 13.5px; color: var(--navy);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;
+}
+.admin-school-info .sub {
+  font-size: 11px; color: var(--muted); display: block; font-weight: 400; margin-top: 1px;
+}
+.admin-ctrl-group {
+  display: flex; gap: 5px; flex-shrink: 0;
+}
+.admin-ctrl-group button {
+  width: auto; padding: 7px 11px; margin-top: 0; font-size: 11.5px; border-radius: 8px; font-weight: 700;
+}
+.btn-toggle-urgent {
+  background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5;
+}
+.btn-toggle-urgent.active {
+  background: #dc2626; color: #ffffff; border-color: transparent;
+}
+.btn-row-delete {
+  background: #f4f5f7; color: #4b5563; border: 1px solid #d1d5db;
+}
+.btn-row-delete:hover {
+  background: #b91c1c; color: #ffffff; border-color: transparent;
+}
+
 /* ── 드롭존 ── */
 .drop-zone {
   border: 2px dashed rgba(201,168,76,.45);
@@ -422,10 +459,6 @@ input::placeholder { color: #bac0cc; }
 }
 .login-hero .btn-gold,
 .login-hero .btn-ghost { position:relative; z-index:1; }
-
-/* ── 삭제결과 행 ── */
-.del-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.del-row button { width:auto; padding:9px 18px; margin-top:0; font-size:12.5px; border-radius:11px; }
 
 /* ── 하단 푸터 ── */
 .site-footer {
@@ -483,7 +516,6 @@ input::placeholder { color: #bac0cc; }
     <div class="card-hd">학교 둘러보기 (유형별)</div>
     <div class="type-grid" id="typeGrid"></div>
 
-    <!-- [수정 사항] 실시간 학교 이름 검색을 위한 입력창 필드 탑재 -->
     <div class="search-input-wrapper">
       <input type="text" id="schoolSearchInput" placeholder="찾으시는 학교 이름을 입력하세요..." oninput="onSearchInput()">
     </div>
@@ -503,7 +535,7 @@ input::placeholder { color: #bac0cc; }
     <div class="card-hd">교사 관리</div>
     <div class="manage-grid">
       <div class="manage-btn" onclick="openAddPage()"><span class="ic">🏫</span>학교 추가</div>
-      <div class="manage-btn" onclick="openDeletePage()"><span class="ic">🗑</span>학교 삭제</div>
+      <div class="manage-btn" onclick="openDeletePage()"><span class="ic">⚙️</span>학교 긴급/삭제 관리</div>
     </div>
     <div class="divider"></div>
     <button class="btn-danger" onclick="logout()">로그아웃</button>
@@ -543,14 +575,17 @@ input::placeholder { color: #bac0cc; }
   </div>
 </div>
 
+<!-- [개편] 원클릭 긴급 조절 및 원클릭 삭제 기능을 탑재한 새로운 관리자 콘솔단 -->
 <div class="page" id="deletePage">
   <div class="card">
-    <div class="card-hd">학교 정돈 및 삭제</div>
-    <select id="deleteType"></select>
-    <select id="deleteSchool"><option value="">학교 선택</option></select>
-    <button class="btn-primary" onclick="showDeleteResult()">조회하기</button>
-    <div id="deleteResult"></div>
-    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
+    <div class="card-hd">학교 긴급 / 삭제 통합 제어</div>
+    <div class="step-lbl">조회할 고등학교 유형</div>
+    <select id="deleteType" onchange="renderAdminManageList()"></select>
+    
+    <div class="step-lbl" style="margin-top:24px;">등록 고등학교 관리 목록</div>
+    <div id="adminManageListContainer" style="margin-top:6px;"></div>
+    
+    <button class="btn-soft" onclick="goMain()" style="margin-top:20px;">메인 화면으로 이동</button>
   </div>
 </div>
 
@@ -597,7 +632,7 @@ const db = getDatabase(app);
 
 let schools = []; 
 let selectedType = '전체보기'; 
-let searchQuery = ''; // [수정] 검색어 데이터 바인딩 변수 추가
+let searchQuery = ''; 
 let selectedImage = '';
 let currentDetailId = ''; 
 
@@ -692,10 +727,9 @@ window.selectType = function(t) {
   renderSchoolList();
 }
 
-// [수정] 인풋 입력 시 실시간 감지하여 검색 연동하는 함수
 window.onSearchInput = function() {
   searchQuery = document.getElementById('schoolSearchInput').value.trim();
-  currentPage = 1; // 검색할 때마다 첫 페이지로 포커싱
+  currentPage = 1; 
   renderSchoolList();
 }
 
@@ -704,30 +738,23 @@ window.fillSelects = function() {
   document.getElementById('addRegion').innerHTML = rH;
 
   const tH = types.map(t => `<option>${t}</option>`).join('');
-  ['addType','deleteType'].forEach(id => { document.getElementById(id).innerHTML = tH; });
-
-  document.getElementById('deleteType').onchange = updateDeleteSchools;
-  updateDeleteSchools(); 
+  document.getElementById('addType').innerHTML = tH;
+  document.getElementById('deleteType').innerHTML = tH;
 }
 
-// [수정] 카테고리 필터와 텍스트 검색 쿼리를 결합한 렌더링 엔진
 function renderSchoolList() {
-  // 1차 카테고리(유형) 필터링
   let filtered = (selectedType === '전체보기') ? [...schools] : schools.filter(s => s.type === selectedType);
   
-  // 2차 검색 텍스트 필터링 (학교 이름 기준 일치 여부 확인)
   if (searchQuery !== '') {
     filtered = filtered.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
   }
   
-  // 상단 타이틀 매칭 변경
   if (selectedType === '전체보기') {
     document.getElementById('listTitleLabel').innerText = searchQuery ? `"${searchQuery}" 검색 결과 (전체)` : "고등학교 전체 리스트";
   } else {
     document.getElementById('listTitleLabel').innerText = searchQuery ? `${selectedType} 내 "${searchQuery}" 검색 결과` : `${selectedType} 전체 리스트`;
   }
 
-  // 상단 고정(isUrgent) 및 가나다 오름차순 정렬
   filtered.sort((a, b) => {
     const aUrgent = a.isUrgent ? 1 : 0;
     const bUrgent = b.isUrgent ? 1 : 0;
@@ -868,7 +895,6 @@ window.addSchool = async function() {
   try {
     await set(ref(db, 'schools/' + customId), newSchool);
     schools.push({ id: customId, ...newSchool });
-    fillSelects();
     alert('학교 및 진학 정보 등록 완료!');
     goMain();
   } catch(e) {
@@ -876,37 +902,74 @@ window.addSchool = async function() {
   }
 }
 
-window.openDeletePage = () => showPage('deletePage');
-window.updateDeleteSchools = function() {
-  const type = document.getElementById('deleteType').value;
-  const f = schools.filter(s => s.type === type);
-  document.getElementById('deleteSchool').innerHTML =
-    `<option value="">학교 선택</option>` + f.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+// [수정] 관리자용 실시간 통합 관리창 호출 로직 개편
+window.openDeletePage = () => {
+  showPage('deletePage');
+  renderAdminManageList();
 }
 
-window.showDeleteResult = function() {
-  const id = document.getElementById('deleteSchool').value;
-  if (!id) { alert('학교를 선택하세요.'); return; }
-  const s = schools.find(item => item.id === id);
-  document.getElementById('deleteResult').innerHTML = `
-    <div class="result-item" style="cursor:default; margin-top:12px;">
-      <div class="del-row">
-        <span>${s.name}</span>
-        <button class="btn-danger" onclick="deleteSchoolFinal('${s.id}')">삭제</button>
+// [수정] 유형별 학교들을 원클릭 긴급 조절 및 원클릭 삭제 처리용 인라인 카드 리스트 렌더링 함수
+window.renderAdminManageList = function() {
+  const currentTargetType = document.getElementById('deleteType').value;
+  const targetedSchools = schools.filter(s => s.type === currentTargetType);
+  
+  targetedSchools.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  
+  const container = document.getElementById('adminManageListContainer');
+  
+  if(targetedSchools.length === 0) {
+    container.innerHTML = `<div class="result-empty" style="padding:14px 0;">현재 해당 유형에 등록된 학교 데이터가 없습니다.</div>`;
+    return;
+  }
+  
+  container.innerHTML = targetedSchools.map(s => {
+    const urgentButtonText = s.isUrgent ? '✅ 긴급 해제' : '🚨 긴급 지정';
+    const urgentButtonClass = s.isUrgent ? 'btn-toggle-urgent active' : 'btn-toggle-urgent';
+    return `
+      <div class="admin-school-row">
+        <div class="admin-school-info">
+          ${s.name}
+          <span class="sub">${s.region || '지역 미지정'} ${s.isUrgent ? '• 🚨 긴급공지 지정됨' : ''}</span>
+        </div>
+        <div class="admin-ctrl-group">
+          <button class="${urgentButtonClass}" onclick="toggleUrgentState('${s.id}', ${s.isUrgent})">${urgentButtonText}</button>
+          <button class="btn-row-delete" onclick="deleteSchoolDirect('${s.id}', '${s.name}')">🗑 삭제</button>
+        </div>
       </div>
-    </div>`;
+    `;
+  }).join('');
 }
 
-window.deleteSchoolFinal = async function(id) {
+// [수정] 학교 옆 긴급 지정/해제 토글 동적 데이터 처리 제어 장치
+window.toggleUrgentState = async function(id, currentUrgentState) {
+  const nextUrgentState = !currentUrgentState;
+  const targetRef = ref(db, 'schools/' + id);
+  
+  try {
+    await update(targetRef, { isUrgent: nextUrgentState });
+    
+    // 로컬 메모리 인덱스 즉각 동기화 반영
+    const idx = schools.findIndex(s => s.id === id);
+    if(idx !== -1) schools[idx].isUrgent = nextUrgentState;
+    
+    // UI 실시간 리렌더링
+    renderAdminManageList();
+  } catch(e) {
+    alert('긴급 상태 변경에 실패했습니다.');
+  }
+}
+
+// [수정] 학교 명칭 바로 옆에서 즉시 연동되는 삭제 실행 함수
+window.deleteSchoolDirect = async function(id, schoolName) {
+  if(!confirm(`[확인] 정말로 "${schoolName}" 정보를 삭제하시겠습니까?\n삭제 후 복구가 불가능합니다.`)) return;
+  
   try {
     await remove(ref(db, 'schools/' + id));
     schools = schools.filter(s => s.id !== id);
-    fillSelects();
-    document.getElementById('deleteResult').innerHTML = '';
-    alert('삭제 완료');
-    goMain();
+    alert(`"${schoolName}" 삭제 처리가 정상 승인되었습니다.`);
+    renderAdminManageList();
   } catch(e) {
-    alert('삭제 처리 중 오류 발생');
+    alert('삭제 처리 중 통신 에러가 발생했습니다.');
   }
 }
 
