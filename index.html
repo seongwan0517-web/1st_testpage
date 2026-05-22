@@ -1,124 +1,908 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>학교 포인트 시스템</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
-        .hidden { display: none; }
-        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        button { cursor: pointer; padding: 5px 10px; }
-    </style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>용유중 진학센터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;800&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy:     #0b1d3a;
+  --navy-mid: #163260;
+  --gold:     #c9a84c;
+  --gold-lt:  #e8c97a;
+  --cream:    #f7f3eb;
+  --cream-dk: #ede5d4;
+  --white:    #ffffff;
+  --txt:      #1a1a2e;
+  --muted:    #7a8499;
+  --border:   rgba(201,168,76,0.22);
+  --card-bg:  rgba(255,255,255,0.78);
+  --sh-lg:    0 24px 64px rgba(11,29,58,0.13);
+  --sh-sm:    0 4px 18px rgba(11,29,58,0.08);
+  --r-card:   26px;
+  --r-btn:    15px;
+  --r-input:  13px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--cream);
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: var(--txt);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── 배경 광원 ── */
+.bg-glow {
+  position: fixed; pointer-events: none; z-index: 0;
+}
+.bg-glow-1 {
+  top: -160px; right: -100px;
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(201,168,76,.16) 0%, transparent 68%);
+}
+.bg-glow-2 {
+  bottom: -120px; left: -80px;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(22,50,96,.14) 0%, transparent 68%);
+}
+
+/* ── 헤더 ── */
+.site-header {
+  position: relative; z-index: 10;
+  padding: 34px 22px 6px;
+}
+.site-header .badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--navy);
+  color: var(--gold);
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 11px; border-radius: 20px;
+  margin-bottom: 11px;
+}
+.site-header .title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 29px; font-weight: 700;
+  color: var(--navy); line-height: 1.2;
+  letter-spacing: -.025em;
+}
+.site-header .title em { color: var(--gold); font-style: normal; }
+.site-header .subtitle {
+  margin-top: 7px; padding-bottom: 24px;
+  font-size: 12.5px; color: var(--muted); font-weight: 300;
+}
+
+/* ── 페이지 ── */
+.page { display: none; padding: 0 14px 44px; position: relative; z-index: 1; }
+.page.show { display: block; }
+
+/* ── 카드 ── */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(14px);
+  border-radius: var(--r-card);
+  padding: 22px 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--sh-lg);
+  border: 1px solid rgba(255,255,255,.92);
+  animation: rise .42s cubic-bezier(.22,1,.36,1) both;
+}
+.card:nth-child(2){ animation-delay:.07s }
+.card:nth-child(3){ animation-delay:.13s }
+@keyframes rise {
+  from { opacity:0; transform:translateY(20px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+
+/* ── 카드 제목 ── */
+.card-hd {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px; font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 9px;
+}
+.card-hd::before {
+  content: '';
+  width: 3.5px; height: 19px; flex-shrink: 0;
+  background: linear-gradient(180deg, var(--gold), var(--gold-lt));
+  border-radius: 2px;
+}
+
+/* ── STEP 라벨 ── */
+.step-lbl {
+  font-size: 10.5px; font-weight: 700;
+  color: var(--gold); letter-spacing: .11em; text-transform: uppercase;
+  margin: 20px 0 9px;
+  display: flex; align-items: center; gap: 7px;
+}
+.step-lbl::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ── 버튼 ── */
+button {
+  width: 100%; border: none;
+  border-radius: var(--r-btn);
+  padding: 15px;
+  font-size: 13.5px; font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  letter-spacing: .04em;
+  cursor: pointer; margin-top: 11px;
+  transition: all .2s cubic-bezier(.22,1,.36,1);
+  position: relative; overflow: hidden;
+}
+button:active { transform: scale(.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  color: var(--white);
+  box-shadow: 0 8px 22px rgba(11,29,58,.3);
+}
+.btn-primary:hover {
+  box-shadow: 0 12px 30px rgba(11,29,58,.38);
+  transform: translateY(-1px);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+  color: var(--navy);
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(201,168,76,.38);
+}
+.btn-gold:hover {
+  box-shadow: 0 12px 30px rgba(201,168,76,.48);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,.88);
+  border: 1.5px solid rgba(255,255,255,.22);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.08); }
+
+.btn-danger {
+  background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+  color: var(--white);
+  box-shadow: 0 6px 18px rgba(185,28,28,.28);
+}
+.btn-danger:hover { box-shadow: 0 10px 26px rgba(185,28,28,.38); transform:translateY(-1px); }
+
+.btn-soft { background: rgba(11,29,58,.07); color: var(--muted); margin-top:18px; }
+.btn-soft:hover { background: rgba(11,29,58,.12); color: var(--navy); }
+
+/* ── 입력 ── */
+input, select {
+  width: 100%; padding: 13px 15px;
+  border-radius: var(--r-input);
+  border: 1.5px solid rgba(201,168,76,.22);
+  font-size: 13.5px;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin-top: 9px;
+  background: rgba(255,255,255,.82);
+  color: var(--navy); outline: none;
+  transition: all .18s;
+  appearance: none; -webkit-appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23c9a84c' stroke-width='1.7' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+input:focus, select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,.13);
+  background: var(--white);
+}
+input::placeholder { color: #bac0cc; }
+
+/* ── 유형 그리드 ── */
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.type-btn {
+  padding: 13px 8px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.65);
+  border: 1.5px solid rgba(201,168,76,.18);
+  text-align: center;
+  font-size: 12.5px; font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--navy); cursor: pointer;
+  transition: all .18s cubic-bezier(.22,1,.36,1);
+}
+.type-btn:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,.07);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(201,168,76,.18);
+}
+.type-btn.active {
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  color: var(--gold-lt); border-color: transparent;
+  box-shadow: 0 6px 18px rgba(11,29,58,.28);
+  transform: translateY(-2px);
+}
+
+/* ── 결과 아이템 ── */
+.result-item {
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg,rgba(255,255,255,.9),rgba(247,243,235,.8));
+  margin-top: 9px; font-weight: 600; font-size: 14px;
+  color: var(--navy); border: 1px solid var(--border);
+  cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.result-item::after { content: '›'; color: var(--gold); font-size: 20px; line-height: 1; }
+.result-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(11,29,58,.11);
+  border-color: var(--gold);
+}
+.result-empty {
+  font-size: 13px; color: #b5bdc8; text-align: center; padding: 14px 0;
+}
+
+/* ── 포스터 박스 ── */
+.poster-box {
+  background: linear-gradient(135deg,rgba(247,243,235,.9),rgba(237,229,212,.6));
+  border: 2px dashed rgba(201,168,76,.35);
+  border-radius: 18px; padding: 14px;
+  min-height: 290px;
+  display: flex; justify-content: center; align-items: center;
+  overflow: hidden; margin-top: 14px;
+}
+.poster-box img { max-width: 100%; border-radius: 13px; box-shadow: var(--sh-sm); }
+.poster-empty {
+  text-align: center; color: #b5bdc8; font-size: 13px; line-height: 1.7;
+}
+.poster-empty::before { content:'🗂'; display:block; font-size:30px; margin-bottom:9px; }
+
+/* ── 관리 그리드 ── */
+.manage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.manage-btn {
+  background: linear-gradient(135deg,rgba(255,255,255,.9),rgba(247,243,235,.8));
+  border: 1px solid var(--border);
+  padding: 18px 12px; border-radius: 17px;
+  text-align: center; font-weight: 700; font-size: 12.5px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--navy); cursor: pointer;
+  transition: all .2s cubic-bezier(.22,1,.36,1); line-height: 1.4;
+}
+.manage-btn .ic { font-size: 21px; display: block; margin-bottom: 5px; }
+.manage-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(11,29,58,.13);
+  border-color: var(--gold);
+}
+
+/* ── 드롭존 ── */
+.drop-zone {
+  border: 2px dashed rgba(201,168,76,.45);
+  background: linear-gradient(135deg,rgba(247,243,235,.65),rgba(237,229,212,.45));
+  padding: 28px; border-radius: 16px;
+  text-align: center; font-weight: 600; font-size: 13.5px;
+  color: var(--gold); margin-top: 14px; cursor: pointer;
+  transition: all .18s;
+}
+.drop-zone:hover { background: rgba(201,168,76,.09); border-color: var(--gold); transform:translateY(-2px); }
+.drop-zone .dz-ic { font-size: 28px; display: block; margin-bottom: 7px; }
+.drop-zone .dz-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; font-weight: 400; }
+.drop-preview { width:100%; margin-top:12px; border-radius:14px; display:none; box-shadow:var(--sh-sm); }
+
+/* ── 구분선 ── */
+.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:14px 0; }
+
+/* ── 로그인 히어로 ── */
+.login-hero {
+  background: linear-gradient(145deg, var(--navy) 0%, var(--navy-mid) 100%);
+  border-radius: var(--r-card);
+  padding: 36px 22px 28px;
+  margin-bottom: 14px;
+  text-align: center;
+  box-shadow: 0 22px 56px rgba(11,29,58,.32);
+  position: relative; overflow: hidden;
+}
+.login-hero::before {
+  content:''; position:absolute; top:-50px; right:-50px;
+  width:210px; height:210px;
+  background: radial-gradient(circle, rgba(201,168,76,.22), transparent 68%);
+}
+.login-hero::after {
+  content:''; position:absolute; bottom:-40px; left:-40px;
+  width:160px; height:160px;
+  background: radial-gradient(circle, rgba(255,255,255,.06), transparent 68%);
+}
+.hero-emblem { font-size:48px; display:block; margin-bottom:14px; position:relative; z-index:1; }
+.hero-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 21px; font-weight: 700;
+  color: var(--white); margin-bottom: 5px;
+  position: relative; z-index: 1;
+}
+.hero-sub {
+  font-size: 10.5px; color: rgba(201,168,76,.8);
+  letter-spacing: .09em; position: relative; z-index: 1;
+}
+.login-hero .btn-gold,
+.login-hero .btn-ghost { position:relative; z-index:1; }
+
+/* ── 삭제결과 행 ── */
+.del-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.del-row button { width:auto; padding:9px 18px; margin-top:0; font-size:12.5px; border-radius:11px; }
+</style>
 </head>
 <body>
 
-    <h2>🏫 포인트 관리 시스템</h2>
-    <hr>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
 
-    <div id="login-section" class="card">
-        <h3>로그인</h3>
-        <input type="text" id="username" placeholder="아이디">
-        <input type="password" id="password" placeholder="비밀번호">
-        <button onclick="login()">접속하기</button>
+<header class="site-header">
+  <div class="badge">🎓 Yongyou Middle School</div>
+  <div class="title">진학<em>센터</em></div>
+  <div class="subtitle">고등학교 진학 정보를 쉽고 빠르게 확인해보세요.</div>
+</header>
+
+<div class="page show" id="loginPage">
+  <div class="login-hero">
+    <span class="hero-emblem">🎓</span>
+    <button class="btn-gold" onclick="guestLogin()">학생 · 학부모 입장</button>
+    <button class="btn-ghost" onclick="openTeacherLogin()">교사 전용 로그인</button>
+  </div>
+
+  <div class="card" id="teacherLoginBox" style="display:none;">
+    <div class="card-hd">교사 로그인</div>
+    <input id="adminId" placeholder="아이디">
+    <input id="adminPw" type="password" placeholder="비밀번호">
+    <button class="btn-primary" onclick="teacherLogin()">로그인</button>
+    <button class="btn-soft" onclick="closeTeacherLogin()">뒤로가기</button>
+  </div>
+</div>
+
+<div class="page" id="mainPage">
+  <div class="card">
+    <div class="card-hd">학교 찾기</div>
+    <div class="step-lbl">Step 01 · 고등학교 유형</div>
+    <div class="type-grid" id="typeGrid"></div>
+    <div class="step-lbl">Step 02 · 지역 선택</div>
+    <select id="regionSelect"></select>
+    <div class="step-lbl">Step 03 · 학교 선택</div>
+    <select id="schoolSelect"><option value="">학교 선택</option></select>
+    <button class="btn-primary" onclick="searchSchool()" style="margin-top:18px;">조회하기</button>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">조회 결과</div>
+    <div id="resultBox"><div class="result-empty">검색 결과가 여기에 표시됩니다.</div></div>
+  </div>
+
+  <div class="card" id="teacherCard" style="display:none;">
+    <div class="card-hd">교사 관리</div>
+    <div class="manage-grid">
+      <div class="manage-btn" onclick="openAddPage()"><span class="ic">🏫</span>학교 추가</div>
+      <div class="manage-btn" onclick="openDeletePage()"><span class="ic">🗑</span>학교 삭제</div>
+      <div class="manage-btn" onclick="openPosterPage()"><span class="ic">🖼</span>포스터 등록</div>
+      <div class="manage-btn" onclick="openPosterDeletePage()"><span class="ic">✂️</span>포스터 삭제</div>
     </div>
+    <div class="divider"></div>
+    <button class="btn-danger" onclick="logout()">로그아웃</button>
+  </div>
+</div>
 
-    <div id="student-section" class="card hidden">
-        <h3>환영합니다, <span id="user-name-display"></span>님!</h3>
-        <p>내 보유 포인트: <strong><span id="user-points-display">0</span> P</strong></p>
-        <hr>
-        <h4>🛒 포인트 상점</h4>
-        <div id="shop-list"></div>
+<div class="page" id="addPage">
+  <div class="card">
+    <div class="card-hd">학교 추가</div>
+    <select id="addType"></select>
+    <select id="addRegion"></select>
+    <input id="addName" placeholder="학교 이름 입력">
+    <button class="btn-primary" onclick="addSchool()">학교 추가</button>
+    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
+  </div>
+</div>
+
+<div class="page" id="deletePage">
+  <div class="card">
+    <div class="card-hd">학교 삭제</div>
+    <select id="deleteType"></select>
+    <select id="deleteRegion"></select>
+    <select id="deleteSchool"><option value="">학교 선택</option></select>
+    <button class="btn-primary" onclick="showDeleteResult()">조회하기</button>
+    <div id="deleteResult"></div>
+    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
+  </div>
+</div>
+
+<div class="page" id="posterPage">
+  <div class="card">
+    <div class="card-hd">포스터 등록</div>
+    <select id="posterType"></select>
+    <select id="posterRegion"></select>
+    <select id="posterSchool"><option value="">학교 선택</option></select>
+    <div class="drop-zone" id="dropZone">
+      <span class="dz-ic">📂</span>
+      포스터 사진 올리기
+      <div class="dz-sub">클릭하거나 파일을 드래그하세요</div>
     </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+    <img id="preview" class="drop-preview">
+    <button class="btn-primary" onclick="savePoster()">포스터 등록</button>
+    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
+  </div>
+</div>
 
-    <div id="admin-section" class="card hidden">
-        <h3>👨‍🏫 관리자 페이지</h3>
-        <h4>학생 포인트 관리</h4>
-        <div id="admin-student-list"></div>
-        <hr>
-        <h4>상점 품목 관리</h4>
-        <div id="admin-item-list"></div>
+<div class="page" id="posterDeletePage">
+  <div class="card">
+    <div class="card-hd">포스터 삭제</div>
+    <select id="posterDeleteType"></select>
+    <select id="posterDeleteRegion"></select>
+    <select id="posterDeleteSchool"><option value="">학교 선택</option></select>
+    <div class="poster-box" id="posterPreviewBox"><div class="poster-empty">등록된 포스터가 없습니다.</div></div>
+    <button class="btn-danger" onclick="deletePoster()" style="margin-top:14px;">포스터 삭제</button>
+    <button class="btn-soft" onclick="goMain()">뒤로가기</button>
+  </div>
+</div>
+
+<div class="page" id="detailPage">
+  <div class="card">
+    <div class="card-hd"><span id="detailTitle">학교명</span></div>
+    <div class="poster-box" id="posterBox">
+      <div class="poster-empty">등록된 포스터가 없습니다.</div>
     </div>
+    <button class="btn-soft" onclick="goMain()" style="margin-top:14px;">← 목록으로</button>
+  </div>
+</div>
 
-    <script>
-        // 임시 데이터 (실제 프로젝트에선 서버 DB에 들어갈 내용)
-        let users = [
-            { id: "student1", pw: "1234", name: "김철수", role: "student", points: 1000 },
-            { id: "teacher1", pw: "admin123", name: "박선생님", role: "admin", points: 0 }
-        ];
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, set, get, child, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        let shopItems = [
-            { id: 1, name: "매점 500원권", price: 500 },
-            { id: 2, name: "숙제 면제권", price: 1000 }
-        ];
+const firebaseConfig = {
+  databaseURL: "https://highschool-d02c9-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
 
-        let currentUser = null;
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-        // 로그인 함수
-        function login() {
-            const id = document.getElementById('username').value;
-            const pw = document.getElementById('password').value;
+// ── 공통 상태 및 데이터 정의 ──────────────────────────────────────────
+let schools = []; 
+let selectedType = '일반고';
+let selectedImage = '';
 
-            const user = users.find(u => u.id === id && u.pw === pw);
+const types = ['일반고','특성화고','마이스터고','특목고','국제고&외국어고','자율고','예체고','과학고'];
+const regions = ['서울특별시','인천광역시','경기도','부산광역시','대구광역시','광주광역시','대전광역시','울산광역시','강원특별자치도','충청북도','충청남도','전라북도','전라남도','경상북도','경상남도','제주특별자치도'];
 
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-section').classList.add('hidden');
-                
-                if (user.role === 'student') {
-                    showStudentPage();
-                } else {
-                    showAdminPage();
-                }
-            } else {
-                alert("아이디 또는 비밀번호가 틀렸습니다.");
-            }
-        }
+const defaultSchools = [
+  {type:'일반고', region:'인천광역시', name:'가림고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'가정고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'가좌고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'검단고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'계산고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'계산여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'계양고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'광성고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'대인고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'덕신고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'도림고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'동산고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'동인천고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'명신여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'문일여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'박문여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'백석고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부개고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부개여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부광고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부광여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부평고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'부평여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'삼산고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'서운고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'서인천고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'석정여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'선인고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'세일고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'송도고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'숭덕여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'신명여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'신송고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'안남고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'연수고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'연수여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'옥련여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인명여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인성여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인일여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인제고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천고잔고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천남고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천남동고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천논현고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천대건고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천마전고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천만수고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천부흥고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천산곡고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천상정고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천세원고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천송천고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천신현고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천연송고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천영선고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천영종고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천예일고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천원당고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천이음고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천중산고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천중앙여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천청라고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천초은고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천포스코고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천아라고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천해송고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천해원고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인천효성고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인항고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인화여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'인하대학교사범대학부속고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'작전고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'작전여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'제물포고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'제일고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'학익고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'학익여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'강화고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'강화여자고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'교동고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'대청고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'덕적고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'백령고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'서도고등학교', poster:''},
+  {type:'일반고', region:'인천광역시', name:'연평고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'강남영상미디어고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'계산공업고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'문곡고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'문학정보고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'부평공업고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'영종국제물류고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'영화관광경영고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천금융고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천기계공업고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천디자인고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천미래생활고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천바이오과학고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천반도체고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천보건고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천뷰티예술고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천비즈니스고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천생활과학고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천소방고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천여자상업고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천재능고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천진산과학고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'인천대중예술고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'한국글로벌셰프고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'한국주얼리고등학교', poster:''},
+  {type:'특성화고', region:'인천광역시', name:'산마을고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천과학고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천과학예술영재학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천국제고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천외국어고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'미추홀외국어고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천예술고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천체육고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천해사고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천공항고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'정석항공과학고등학교', poster:''},
+  {type:'특목고', region:'인천광역시', name:'인천해양과학고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'인천해사고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'인천공항고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'정석항공과학고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'인천해양과학고등학교', poster:''},
+  {type:'마이스터고', region:'인천광역시', name:'인평자동차고등학교', poster:''},
+  {type:'국제고&외국어고', region:'인천광역시', name:'인천국제고등학교', poster:''},
+  {type:'국제고&외국어고', region:'인천광역시', name:'인천외국어고등학교', poster:''},
+  {type:'국제고&외국어고', region:'인천광역시', name:'미추홀외국어고등학교', poster:''},
+  {type:'자율고', region:'인천광역시', name:'인천하늘고등학교', poster:''},
+  {type:'자율고', region:'인천광역시', name:'인천포스코고등학교', poster:''},
+  {type:'자율고', region:'인천광역시', name:'인천대중예술고등학교', poster:''},
+  {type:'예체고', region:'인천광역시', name:'인천예술고등학교', poster:''},
+  {type:'예체고', region:'인천광역시', name:'인천체육고등학교', poster:''},
+  {type:'예체고', region:'인천광역시', name:'인천뷰티예술고등학교', poster:''},
+  {type:'과학고', region:'인천광역시', name:'인천과학고등학교', poster:''},
+  {type:'과학고', region:'인천광역시', name:'인천과학예술영재학교', poster:''}
+];
 
-        // 학생 페이지 렌더링
-        function showStudentPage() {
-            document.getElementById('student-section').classList.remove('hidden');
-            document.getElementById('user-name-display').innerText = currentUser.name;
-            document.getElementById('user-points-display').innerText = currentUser.points;
+// ── Firebase 데이터 로드 및 초기화 ──────────────────────────────────────────
+async function initSchools() {
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, 'schools'));
+    if (snapshot.exists()) {
+      // Firebase에 저장된 데이터 객체를 배열로 변환
+      const dataObj = snapshot.val();
+      schools = Object.keys(dataObj).map(key => ({ id: key, ...dataObj[key] }));
+    } else {
+      // DB가 비어있는 초기 상태라면 defaultSchools 세팅
+      schools = [];
+      for (let s of defaultSchools) {
+        const newRef = ref(db, 'schools/' + encodeName(s.name) + '_' + s.type);
+        await set(newRef, s);
+        schools.push({ id: encodeName(s.name) + '_' + s.type, ...s });
+      }
+    }
+    renderTypes();
+    fillSelects();
+  } catch (error) {
+    console.error("데이터 로드 실패:", error);
+  }
+}
 
-            let html = "";
-            shopItems.forEach(item => {
-                html += `<p>${item.name} - ${item.price}P <button onclick="buyItem(${item.price})">구매</button></p>`;
-            });
-            document.getElementById('shop-list').innerHTML = html;
-        }
+// 키값으로 사용할 수 없는 특수문자 우회 치환 함수
+function encodeName(name) {
+  return name.replace(/[\.\#\$\[\]\/]/g, "_");
+}
 
-        // 관리자 페이지 렌더링
-        function showAdminPage() {
-            document.getElementById('admin-section').classList.remove('hidden');
-            renderAdminStudents();
-        }
+// ── 페이지 전환 ──────────────────────────────────────
+window.showPage = function(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  el.querySelectorAll('.card').forEach((c, i) => {
+    c.style.animation = 'none';
+    c.offsetHeight;
+    c.style.animation = `rise .42s cubic-bezier(.22,1,.36,1) ${i * .07}s both`;
+  });
+}
 
-        function renderAdminStudents() {
-            let html = "";
-            users.filter(u => u.role === 'student').forEach(s => {
-                html += `<p>${s.name}: ${s.points}P 
-                        <button onclick="updatePoint('${s.id}', 100)">+100</button>
-                        <button onclick="updatePoint('${s.id}', -100)">-100</button></p>`;
-            });
-            document.getElementById('admin-student-list').innerHTML = html;
-        }
+window.guestLogin = () => showPage('mainPage');
+window.openTeacherLogin = () => document.getElementById('teacherLoginBox').style.display = 'block';
+window.closeTeacherLogin = () => document.getElementById('teacherLoginBox').style.display = 'none';
+window.goMain = () => showPage('mainPage');
+window.logout = () => location.reload();
 
-        function updatePoint(sid, amount) {
-            const user = users.find(u => u.id === sid);
-            user.points += amount;
-            renderAdminStudents(); // 화면 갱신
-            alert(`${user.name}의 포인트가 수정되었습니다.`);
-        }
+window.teacherLogin = function() {
+  const id = document.getElementById('adminId').value;
+  const pw = document.getElementById('adminPw').value;
+  if (id === 'admin' && pw === '1234!') {
+    document.getElementById('teacherCard').style.display = 'block';
+    showPage('mainPage');
+  } else {
+    alert('로그인 실패');
+  }
+}
 
-        function buyItem(price) {
-            if (currentUser.points >= price) {
-                currentUser.points -= price;
-                document.getElementById('user-points-display').innerText = currentUser.points;
-                alert("구매 완료!");
-            } else {
-                alert("포인트가 부족합니다.");
-            }
-        }
-    </script>
+// ── 유형 버튼 ────────────────────────────────────────
+window.renderTypes = function() {
+  document.getElementById('typeGrid').innerHTML = types.map(t =>
+    `<div class="type-btn ${selectedType === t ? 'active' : ''}" onclick="selectType('${t}')">${t}</div>`
+  ).join('');
+}
+
+window.selectType = function(t) { 
+  selectedType = t; 
+  renderTypes(); 
+  updateSchoolList(); 
+}
+
+// ── select 엘리먼트 채우기 ────────────────────────────────────
+window.fillSelects = function() {
+  const rH = regions.map(r => `<option>${r}</option>`).join('');
+  ['regionSelect','addRegion','deleteRegion','posterRegion','posterDeleteRegion']
+    .forEach(id => { document.getElementById(id).innerHTML = rH; });
+
+  const tH = types.map(t => `<option>${t}</option>`).join('');
+  ['addType','deleteType','posterType','posterDeleteType']
+    .forEach(id => { document.getElementById(id).innerHTML = tH; });
+
+  // 체인식 이벤트 바인딩
+  document.getElementById('regionSelect').onchange = updateSchoolList;
+  document.getElementById('deleteType').onchange = updateDeleteSchools;
+  document.getElementById('deleteRegion').onchange = updateDeleteSchools;
+  document.getElementById('posterType').onchange = updatePosterSchools;
+  document.getElementById('posterRegion').onchange = updatePosterSchools;
+  document.getElementById('posterDeleteType').onchange = updatePosterDeleteSchools;
+  document.getElementById('posterDeleteRegion').onchange = updatePosterDeleteSchools;
+  document.getElementById('posterDeleteSchool').onchange = function() {
+    const s = schools.find(s => s.name === this.value && s.type === document.getElementById('posterDeleteType').value);
+    document.getElementById('posterPreviewBox').innerHTML = s?.poster
+      ? `<img src="${s.poster}">`
+      : `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+  };
+
+  updateSchoolList(); 
+  updateDeleteSchools(); 
+  updatePosterSchools(); 
+  updatePosterDeleteSchools();
+}
+
+window.updateSchoolList = function() {
+  const region = document.getElementById('regionSelect').value;
+  const f = schools
+    .filter(s => s.type === selectedType && s.region === region)
+    .sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  document.getElementById('schoolSelect').innerHTML =
+    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+}
+
+// ── 학교 검색 및 상세 페이지 ────────────────────────────────────────
+window.searchSchool = function() {
+  const name = document.getElementById('schoolSelect').value;
+  if (!name) { alert('학교를 선택하세요.'); return; }
+  document.getElementById('resultBox').innerHTML =
+    `<div class="result-item" onclick="openDetail('${name}')">${name}</div>`;
+}
+
+window.openDetail = function(name) {
+  showPage('detailPage');
+  const s = schools.find(s => s.name === name && s.type === selectedType);
+  document.getElementById('detailTitle').innerText = name;
+  document.getElementById('posterBox').innerHTML = s?.poster
+    ? `<img src="${s.poster}">`
+    : `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+}
+
+// ── 학교 추가 관리 ────────────────────────────────────────
+window.openAddPage = () => showPage('addPage');
+window.addSchool = async function() {
+  const type = document.getElementById('addType').value;
+  const region = document.getElementById('addRegion').value;
+  const name = document.getElementById('addName').value.trim();
+  
+  if (!name) { alert('학교 이름을 입력하세요.'); return; }
+  if (schools.find(s => s.name === name && s.type === type && s.region === region)) {
+    alert('이미 등록된 학교입니다.'); return;
+  }
+
+  const newSchool = { type, region, name, poster: '', custom: true };
+  const customId = encodeName(name) + '_' + type;
+
+  try {
+    await set(ref(db, 'schools/' + customId), newSchool);
+    schools.push({ id: customId, ...newSchool });
+    fillSelects();
+    document.getElementById('addName').value = '';
+    alert('학교 추가 완료');
+  } catch(e) {
+    alert('DB 저장 오류 발생');
+  }
+}
+
+// ── 학교 삭제 관리 ────────────────────────────────────────
+window.openDeletePage = () => showPage('deletePage');
+window.updateDeleteSchools = function() {
+  const type = document.getElementById('deleteType').value;
+  const region = document.getElementById('deleteRegion').value;
+  const f = schools.filter(s => s.type === type && s.region === region);
+  document.getElementById('deleteSchool').innerHTML =
+    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+}
+
+window.showDeleteResult = function() {
+  const name = document.getElementById('deleteSchool').value;
+  if (!name) { alert('학교를 선택하세요.'); return; }
+  document.getElementById('deleteResult').innerHTML = `
+    <div class="result-item" style="cursor:default; margin-top:12px;">
+      <div class="del-row">
+        <span>${name}</span>
+        <button class="btn-danger" onclick="deleteSchoolFinal('${name}')">삭제</button>
+      </div>
+    </div>`;
+}
+
+window.deleteSchoolFinal = async function(name) {
+  const type = document.getElementById('deleteType').value;
+  const target = schools.find(s => s.name === name && s.type === type);
+  if (!target) return;
+
+  try {
+    await remove(ref(db, 'schools/' + target.id));
+    schools = schools.filter(s => s.id !== target.id);
+    fillSelects();
+    document.getElementById('deleteResult').innerHTML = '';
+    alert('삭제 완료');
+  } catch(e) {
+    alert('삭제 처리 중 오류 발생');
+  }
+}
+
+// ── 포스터 등록 관리 ──────────────────────────────────────
+window.openPosterPage = () => showPage('posterPage');
+window.updatePosterSchools = function() {
+  const type = document.getElementById('posterType').value;
+  const region = document.getElementById('posterRegion').value;
+  const f = schools.filter(s => s.type === type && s.region === region);
+  document.getElementById('posterSchool').innerHTML =
+    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+}
+
+window.savePoster = async function() {
+  const type = document.getElementById('posterType').value;
+  const name = document.getElementById('posterSchool').value;
+  if (!name) { alert('학교를 선택하세요.'); return; }
+  if (!selectedImage) { alert('이미지를 선택하세요.'); return; }
+
+  const target = schools.find(s => s.name === name && s.type === type);
+  if (!target) return;
+
+  try {
+    await update(ref(db, 'schools/' + target.id), { poster: selectedImage });
+    target.poster = selectedImage;
+    alert('포스터 등록 완료');
+  } catch(e) {
+    alert('포스터 저장 실패');
+  }
+}
+
+// ── 포스터 삭제 관리 ──────────────────────────────────────
+window.openPosterDeletePage = () => showPage('posterDeletePage');
+window.updatePosterDeleteSchools = function() {
+  const type = document.getElementById('posterDeleteType').value;
+  const region = document.getElementById('posterDeleteRegion').value;
+  const f = schools.filter(s => s.type === type && s.region === region);
+  document.getElementById('posterDeleteSchool').innerHTML =
+    `<option value="">학교 선택</option>` + f.map(s => `<option>${s.name}</option>`).join('');
+  document.getElementById('posterPreviewBox').innerHTML =
+    `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+}
+
+window.deletePoster = async function() {
+  const type = document.getElementById('posterDeleteType').value;
+  const name = document.getElementById('posterDeleteSchool').value;
+  if (!name) { alert('학교를 선택하세요.'); return; }
+
+  const target = schools.find(s => s.name === name && s.type === type);
+  if (!target) return;
+
+  try {
+    await update(ref(db, 'schools/' + target.id), { poster: '' });
+    target.poster = '';
+    document.getElementById('posterPreviewBox').innerHTML =
+      `<div class="poster-empty">등록된 포스터가 없습니다.</div>`;
+    alert('포스터 삭제 완료');
+  } catch(e) {
+    alert('포스터 삭제 실패');
+  }
+}
+
+// ── 이미지 로컬 파일 드롭 및 업로드 ────────────────────────────────────
+const drop = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+drop.onclick = () => fileInput.click();
+fileInput.onchange = function() { loadImage(this.files[0]); };
+drop.ondragover = e => e.preventDefault();
+drop.ondrop = e => { e.preventDefault(); loadImage(e.dataTransfer.files[0]); };
+
+function loadImage(f) {
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    selectedImage = e.target.result;
+    const p = document.getElementById('preview');
+    p.src = selectedImage; 
+    p.style.display = 'block';
+  };
+  r.readAsDataURL(f);
+}
+
+// 실행 시작
+initSchools();
+</script>
+
 </body>
 </html>
