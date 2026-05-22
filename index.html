@@ -575,7 +575,6 @@ input::placeholder { color: #bac0cc; }
   </div>
 </div>
 
-<!-- [개편] 원클릭 긴급 조절 및 원클릭 삭제 기능을 탑재한 새로운 관리자 콘솔단 -->
 <div class="page" id="deletePage">
   <div class="card">
     <div class="card-hd">학교 긴급 / 삭제 통합 제어</div>
@@ -642,35 +641,19 @@ const itemsPerPage = 5;
 const types = ['일반고','특성화고','마이스터고','특목고','국제고&외국어고','자율고','예체고','과학고'];
 const regions = ['서울특별시','인천광역시','경기도','부산광역시','대구광역시','광주광역시','대전광역시','울산광역시','강원특별자치도','충청북도','충청남도','전라북도','전라남도','경상북도','경상남도','제주특별자치도'];
 
-const defaultSchools = [
-  {type:'일반고', region:'인천광역시', name:'가림고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'일반고', region:'인천광역시', name:'가정고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'일반고', region:'인천광역시', name:'가좌고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'일반고', region:'인천광역시', name:'검단고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'일반고', region:'인천광역시', name:'계산고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'일반고', region:'인천광역시', name:'인천영종고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: true},
-  {type:'일반고', region:'인천광역시', name:'인천중산고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'특성화고', region:'인천광역시', name:'영종국제물류고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'특성화고', region:'인천광역시', name:'인천디자인고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'마이스터고', region:'인천광역시', name:'인천전자마이스터고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'특목고', region:'인천광역시', name:'인천국제고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false},
-  {type:'과학고', region:'인천광역시', name:'인천과학고등학교', poster:'', link:'', schedule:'', likes: 0, isUrgent: false}
-];
+// [수정] 기본 하드코딩 데이터 목록을 완전히 비워냄으로써 기본값 강제 재생성을 원천 차단
+const defaultSchools = [];
 
 async function initSchools() {
   const dbRef = ref(db);
   try {
     const snapshot = await get(child(dbRef, 'schools'));
-    if (snapshot.exists()) {
+    // [수정] 스냅샷이 존재하고 값이 비어있지 않을 때만 로딩하며, 없을 때는 빈 배열로 깔끔하게 인정
+    if (snapshot.exists() && snapshot.val() !== null) {
       const dataObj = snapshot.val();
       schools = Object.keys(dataObj).map(key => ({ id: key, ...dataObj[key] }));
     } else {
       schools = [];
-      for (let s of defaultSchools) {
-        const id = encodeName(s.name) + '_' + s.type;
-        await set(ref(db, 'schools/' + id), s);
-        schools.push({ id, ...s });
-      }
     }
     renderTypes();
     fillSelects();
@@ -902,13 +885,11 @@ window.addSchool = async function() {
   }
 }
 
-// [수정] 관리자용 실시간 통합 관리창 호출 로직 개편
 window.openDeletePage = () => {
   showPage('deletePage');
   renderAdminManageList();
 }
 
-// [수정] 유형별 학교들을 원클릭 긴급 조절 및 원클릭 삭제 처리용 인라인 카드 리스트 렌더링 함수
 window.renderAdminManageList = function() {
   const currentTargetType = document.getElementById('deleteType').value;
   const targetedSchools = schools.filter(s => s.type === currentTargetType);
@@ -940,7 +921,6 @@ window.renderAdminManageList = function() {
   }).join('');
 }
 
-// [수정] 학교 옆 긴급 지정/해제 토글 동적 데이터 처리 제어 장치
 window.toggleUrgentState = async function(id, currentUrgentState) {
   const nextUrgentState = !currentUrgentState;
   const targetRef = ref(db, 'schools/' + id);
@@ -948,18 +928,15 @@ window.toggleUrgentState = async function(id, currentUrgentState) {
   try {
     await update(targetRef, { isUrgent: nextUrgentState });
     
-    // 로컬 메모리 인덱스 즉각 동기화 반영
     const idx = schools.findIndex(s => s.id === id);
     if(idx !== -1) schools[idx].isUrgent = nextUrgentState;
     
-    // UI 실시간 리렌더링
     renderAdminManageList();
   } catch(e) {
     alert('긴급 상태 변경에 실패했습니다.');
   }
 }
 
-// [수정] 학교 명칭 바로 옆에서 즉시 연동되는 삭제 실행 함수
 window.deleteSchoolDirect = async function(id, schoolName) {
   if(!confirm(`[확인] 정말로 "${schoolName}" 정보를 삭제하시겠습니까?\n삭제 후 복구가 불가능합니다.`)) return;
   
